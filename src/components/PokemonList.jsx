@@ -51,31 +51,27 @@ const borderColor = (types) => {
   return typeBorderColors[primaryType];
 };
 
-export default function PokemonList() {
-  const [pokemons, setPokemons] = useState([]);
+export default function PokemonList({ pokemons, setPokemons }) {
   const [search, setSearch] = useState("");
 
-  const filteredPokemons = pokemons.filter((pokemon) => pokemon.name.toLowerCase().includes(search));
+  const allPokemons = pokemons.filter(p =>
+    p.name.toLowerCase().includes(search)
+  );
 
   useEffect(() => {
-    fetch('https://pokeapi.co/api/v2/pokemon?limit=151')
-      .then((response) => response.json())
-      .then((data) => {
-        Promise.all(
-          data.results.map((pokemon) =>
-            fetch(pokemon.url).then((res) => res.json())
-          )
-        )
-          .then((pokemonDetails) => {
+    if (pokemons.length === 0) {
+      fetch("https://pokeapi.co/api/v2/pokemon?limit=151")
+        .then((response) => response.json())
+        .then((data) => {
+          Promise.all(
+            data.results.map((pokemon) =>
+              fetch(pokemon.url).then((res) => res.json())
+            )
+          ).then((pokemonDetails) => {
             setPokemons(pokemonDetails);
-          })
-          .catch((error) => {
-            console.error('Error fetching Pokemons', error);
           });
-      })
-      .catch((error) => {
-        console.error('Error fetching Pokemons', error);
-      });
+        });
+    }
   }, []);
 
   if (pokemons.length === 0) {
@@ -84,59 +80,69 @@ export default function PokemonList() {
         <h1 className="animate-pulse text-5xl">Loading ...</h1>
         <img className="animate-spin w-50" src="/loading.png" alt="" />
       </div>
-    )
+    );
   }
 
-  return (     
-    <div  className="flex flex-col justify-center items-center h-full w-full background">
-      <div className="flex flex-wrap justify-center h-full max-w-[1920px] gap-5 gap-y-5 py-5">
+  return (
+    <div className="flex flex-col justify-center items-center h-full w-full background">
+      <div className="flex flex-wrap justify-center h-full max-w-[1920px] gap-5 py-5">
+        {/* barre de recherche */}
         <div className="flex flex-row justify-between items-center h-22 w-full bg-gray-400 p-10 top-0 fixed z-50 opacity-90 shadow-2xl">
           <img className="w-50" src="/logo.png" alt="" />
           <img className="w-15" src="/picka.png" alt="" />
           <input
             type="search"
             placeholder="rechercher un pokemon"
-            onChange={((e) => setSearch(e.target.value.toLowerCase()))}
+            onChange={(e) => setSearch(e.target.value.toLowerCase())}
             className="flex self-center w-150 p-4 border-3 font-pokemon rounded-4xl h-15 border-gray-600 text-center focus:outline-none font-bold"
           />
           <img className="w-40" src="/pokeball.png" alt="" />
           <Link to="/newpokemon">
-            <button className="flex flex-row items-center font-pokemon border-3 p-5 border-gray-600 rounded-4xl hover:scale-110 transition-transform h-14"><p>Ajouter un pokemon</p></button>
+            <button className="flex flex-row items-center font-pokemon border-3 p-5 border-gray-600 rounded-4xl hover:scale-110 transition-transform h-14">
+              <p>Ajouter un pokemon</p>
+            </button>
           </Link>
         </div>
 
         <div className="flex flex-wrap justify-center w-[80vw] gap-5 gap-y-5 py-30">
-          {
-            filteredPokemons.map((pokemon, pokemonId) => (
-              <Link key={pokemonId} to={`/pokemon/${pokemon.name}`}
-                className={`flex flex-col gap-2 p-5 bg-white rounded-2xl cursor-pointer opacity-100 hover:-translate-y-3 hover:duration-250 w-[18vw] shadow-xl border-e-4 border-b-4 
-                ${borderColor(pokemon.types)}`} >
-                <div className="flex justify-end gap-2">
-                  {pokemon.types.map((type) => (
-                    <p className={`${typeBgColors[type.type.name]} p-1 rounded-lg w-15 flex justify-center text-sm`}>
-                      {type.type.name}
-                    </p>
-                  ))}
-                </div>
-                <div className="flex flex-col items-center bg-gray-300">
-                    <img src={pokemon.sprites.other['official-artwork'].front_default}
-                    className={`h-[30vh] w-[15vw] rounded-lg`} alt="" />
-                </div>
-                <div className="flex flex-col items-center">
-                    <p className="text-2xl bg-gray-200 rounded-4xl p-2 h-12 w-12 text-center font-pokemon">{pokemon.id}</p>
+          {allPokemons.map((pokemon) => (
+            <Link
+              key={pokemon.id}
+              to={`/pokemon/${pokemon.name}`}
+              className={`flex flex-col gap-2 p-5 bg-white rounded-2xl cursor-pointer opacity-100 hover:-translate-y-3 hover:duration-250 w-[18vw] shadow-xl border-e-4 border-b-4 
+              ${borderColor(pokemon.types)}`}
+            >
+              <div className="flex justify-end gap-2">
+                {pokemon.types.map((type, index) => (
+                  <p
+                    key={type.type.name + index}
+                    className={`${typeBgColors[type.type.name]} p-1 rounded-lg w-15 flex justify-center text-sm`}
+                  >
+                    {type.type.name}
+                  </p>
+                ))}
+              </div>
+              <div className="flex flex-col items-center bg-gray-300">
+                <img
+                  src={pokemon.sprites.other['official-artwork'].front_default}
+                  className={`h-[30vh] w-[15vw] rounded-lg`}
+                  alt=""
+                />
+              </div>
+              <div className="flex flex-col items-center">
+                <p className="text-2xl bg-gray-200 rounded-4xl p-2 h-12 w-12 text-center font-pokemon">{pokemon.id}</p>
                 <h2 className="text-2xl font-bold font-pokemon">{pokemon.name}</h2>
-            </div>
-              </Link>
-            ))
-          }
+              </div>
+            </Link>
+          ))}
         </div>
-        {filteredPokemons.length === 0 && (
+        {allPokemons.length === 0 && (
           <div className="flex flex-col justify-center font-pokemon items-center gap-10 h-full">
             <p className="text-3xl">Aucun Pokémon ne correspond à votre recherche</p>
             <img className="w-91 p-10" src="sorry.png" alt="" />
           </div>
         )}
       </div>
-    </div >
-  )
+    </div>
+  );
 }

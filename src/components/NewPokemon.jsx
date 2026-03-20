@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function NewPokemon() {
+export default function NewPokemon({ setPokemons }) {
   const [inputs, setInputs] = useState({
     name: "",
     talents: "",
@@ -19,25 +19,36 @@ export default function NewPokemon() {
     const newErrors = {};
 
     if (!inputs.name.trim()) newErrors.name = "Le nom du Pokémon est obligatoire";
+    if (!inputs.talents.trim()) newErrors.talents = "Les talents sont obligatoires";
     if (!inputs.type.trim()) newErrors.type = "La caractéristique est obligatoire";
     if (!inputs.attack.trim()) newErrors.attack = "L'attaque est obligatoire";
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      console.log("Création du Pokémon :", inputs);
-      setInputs({ name: "", talents: "", type: "", attack: "" }); // reset
+      const newPokemon = {
+        id: Date.now(),
+        name: inputs.name.toLowerCase(),
+        types: [{ type: { name: inputs.type.toLowerCase() } }],
+        sprites: {
+          other: {
+            "official-artwork": {
+              front_default: "/pokeball.png"
+            }
+          }
+        }
+      };
+
+      setPokemons(prev => [newPokemon, ...prev]);
+
+      setInputs({
+        name: "",
+        talents: "",
+        type: "",
+        attack: ""
+      });
     }
   };
-
-   if (length != 0) {
-    return (
-      <div className="w-full h-screen flex flex-col justify-center text-center items-center font-pokemon text-4xl loading gap-5">
-        <h1 className="animate-pulse text-5xl">Loading ...</h1>
-        <img className="animate-spin w-50" src="/loading.png" alt="" />
-      </div>
-    )
-  }
 
   return (
     <div className="flex justify-center background h-screen">
