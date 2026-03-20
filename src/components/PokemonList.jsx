@@ -90,15 +90,19 @@ export default function PokemonList() {
   return (     
     <div  className="flex flex-col justify-center items-center h-full w-full background">
       <div className="flex flex-wrap justify-center h-full max-w-[1920px] gap-5 gap-y-5 py-5">
-        <div className="flex justify-between items-center h-22 w-full bg-gray-400 p-5 top-0 fixed z-50 opacity-90 shadow-2xl">
+        <div className="flex flex-row justify-between items-center h-22 w-full bg-gray-400 p-10 top-0 fixed z-50 opacity-90 shadow-2xl">
           <img className="w-50" src="/logo.png" alt="" />
+          <img className="w-15" src="/picka.png" alt="" />
           <input
             type="search"
             placeholder="rechercher un pokemon"
             onChange={((e) => setSearch(e.target.value.toLowerCase()))}
-            className="w-200 p-4 border-3 font-pokemon rounded-4xl h-15 border-gray-600 text-center focus:outline-none font-bold"
+            className="flex self-center w-150 p-4 border-3 font-pokemon rounded-4xl h-15 border-gray-600 text-center focus:outline-none font-bold"
           />
-          <img className="w-50" src="/pokeball.png" alt="" />
+          <img className="w-40" src="/pokeball.png" alt="" />
+          <Link to="/newpokemon">
+            <button className="flex flex-row items-center font-pokemon border-3 p-5 border-gray-600 rounded-4xl hover:scale-110 transition-transform h-14"><p>Ajouter un pokemon</p></button>
+          </Link>
         </div>
 
         <div className="flex flex-wrap justify-center w-[80vw] gap-5 gap-y-5 py-30">
