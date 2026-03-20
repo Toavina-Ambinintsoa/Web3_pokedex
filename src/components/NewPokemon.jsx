@@ -19,7 +19,6 @@ export default function NewPokemon() {
     const newErrors = {};
 
     if (!inputs.name.trim()) newErrors.name = "Le nom du Pokémon est obligatoire";
-    if (!inputs.talents.trim()) newErrors.talents = "Les talents sont obligatoires";
     if (!inputs.type.trim()) newErrors.type = "La caractéristique est obligatoire";
     if (!inputs.attack.trim()) newErrors.attack = "L'attaque est obligatoire";
 
