@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function NewPokemon({ setPokemons }) {
   const [inputs, setInputs] = useState({
@@ -7,48 +8,46 @@ export default function NewPokemon({ setPokemons }) {
     type: "",
     attack: ""
   });
+  
+  const navigate = useNavigate();
 
   const [errors, setErrors] = useState({});
+
 
   const handleChange = (e) => {
     setInputs({ ...inputs, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const newErrors = {};
+  e.preventDefault();
+  const newErrors = {};
 
-    if (!inputs.name.trim()) newErrors.name = "Le nom du Pokémon est obligatoire";
-    if (!inputs.talents.trim()) newErrors.talents = "Les talents sont obligatoires";
-    if (!inputs.type.trim()) newErrors.type = "La caractéristique est obligatoire";
-    if (!inputs.attack.trim()) newErrors.attack = "L'attaque est obligatoire";
+  if (!inputs.name.trim()) newErrors.name = "Le nom du Pokémon est obligatoire";
+  if (!inputs.talents.trim()) newErrors.talents = "Les talents sont obligatoires";
+  if (!inputs.type.trim()) newErrors.type = "La caractéristique est obligatoire";
+  if (!inputs.attack.trim()) newErrors.attack = "L'attaque est obligatoire";
 
-    setErrors(newErrors);
+  setErrors(newErrors);
 
-    if (Object.keys(newErrors).length === 0) {
-      const newPokemon = {
-        id: Date.now(),
-        name: inputs.name.toLowerCase(),
-        types: [{ type: { name: inputs.type.toLowerCase() } }],
-        sprites: {
-          other: {
-            "official-artwork": {
-              front_default: "/pokeball.png"
-            }
+  if (Object.keys(newErrors).length === 0) {
+    const newPokemon = {
+      id: Date.now(),
+      name: inputs.name.toLowerCase(),
+      types: [{ type: { name: inputs.type.toLowerCase() } }],
+      sprites: {
+        other: {
+          "official-artwork": {
+            front_default: "/pokeball.png"
           }
         }
-      };
+      }
+    };
 
-      setPokemons(prev => [newPokemon, ...prev]);
+    setPokemons(prev => [newPokemon, ...prev]);
 
-      setInputs({
-        name: "",
-        talents: "",
-        type: "",
-        attack: ""
-      });
-    }
-  };
+    navigate("/home"); // ✅ redirection automatique
+  }
+};
 
   return (
     <div className="flex justify-center background h-screen">
@@ -92,7 +91,7 @@ export default function NewPokemon({ setPokemons }) {
             value={inputs.attack}
             onChange={handleChange}
             type="text"
-            placeholder="Attaque du Pokémon"
+            placeholder="Attaque du Pokémon (degats par attaque)"
             className="font-pokemon border-2 rounded-xl text-center h-12 p-2"
           />
           {errors.attack && <p className="text-red-500 text-sm">{errors.attack}</p>}
